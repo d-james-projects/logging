@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+data:
+  filebeat.yml: |-
+    filebeat.registry_file: /etc/filebeat/filebeat_registry
+
+    filebeat.prospectors:
+    - input_type: log
+      paths:
+        - "/etc/log/*.log"
+      document_type: kube-logs
+
+    output.logstash:
+        hosts: ${LOGSTASH_HOSTS}
+        timeout: 15
+
+    logging.level: ${LOG_LEVEL}
+
