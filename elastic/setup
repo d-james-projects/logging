@@ -1,0 +1,23 @@
+mkdir elastic
+add dirs logstash/conf.d
+add dirs var/log/
+
+run
+sudo docker run -d --name elasticsearch -v "$PWD/esdata":/usr/share/elasticsearch/data -p 9200:9200 elasticsearch
+
+
+sudo docker run -d --name logstash -v $PWD/logstash/conf.d:/etc/logstash/conf.d:ro -v $PWD/var/log:/host/var/log:ro --net host logstash:2.1.0 logstash -f /etc/logstash/conf.d --debug
+
+
+curl localhost:9200/logstash-*/_search?pretty=true
+
+
+sudo docker run -d --name kibana -p 5601:5601 -e ELASTICSEARCH_URL=http://localhost:9200 --net host kibana
+
+
+sudo docker run -d --name elasticsearch-hq -p 5000:5000 --net host elastichq/elasticsearch-hq
+
+while true; do echo “some test text:” $date >> var/log/test.log; sleep 1; done
+
+curl localhost:9200/_cluster/stats?pretty
+
